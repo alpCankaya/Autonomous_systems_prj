@@ -1,0 +1,7 @@
+<launch>
+  <!-- Include the simulation launch from the 'simulation' package -->
+  <include file="$(find simulation)/launch/simulation.launch" />
+
+  <!-- Launch the desired_state_pub_node from your package -->
+  <node pkg="desired_state_pub" type="desired_state_pub_node" name="desired_state_pub_node" output="screen" />
+</launch>
