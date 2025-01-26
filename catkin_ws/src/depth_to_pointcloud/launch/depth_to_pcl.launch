@@ -1,0 +1,38 @@
+<launch>
+  <!-- Nodelet manager -->
+  <node pkg="nodelet" type="nodelet" name="depth_proc_manager" args="manager" output="screen"/>
+
+  <!-- Step 1: run the 'register' nodelet, so that depth is aligned to color -->
+  <node pkg="nodelet" type="nodelet" name="register_depth" 
+        args="load depth_image_proc/register depth_proc_manager" output="screen">
+    <!-- Input from /realsense/depth/image, etc. -->
+    <remap from="depth/image_rect"    to="/realsense/depth/image"/>
+    <remap from="depth/camera_info"   to="/realsense/depth/camera_info"/>
+    <remap from="rgb/image_rect_color" to="/realsense/rgb/left_image_raw"/>
+    <remap from="rgb/camera_info"      to="/realsense/rgb/left_image_info"/>
+    
+  </node>
+
+  <!-- Step 2: point_cloud_xyzrgb nodelet to merge depth+color -->
+  <node pkg="nodelet" type="nodelet" name="point_cloud_xyzrgb" 
+        args="load depth_image_proc/point_cloud_xyzrgb depth_proc_manager" output="screen">
+    <!-- Remap to the registered depth topics that come out of the 'register' nodelet -->
+    <remap from="depth_registered/image_rect"    to="/depth_registered/image_rect"/>
+    <remap from="depth_registered/camera_info"   to="/depth_registered/camera_info"/>
+
+    <!-- Remap to your color topics (the same ones used by the register nodelet or the new aligned color) -->
+    <remap from="rgb/image_rect_color" to="/realsense/rgb/left_image_raw"/>
+    <remap from="rgb/camera_info"      to="/realsense/rgb/left_image_info"/>
+
+    <!-- Adjust the output topic if you want to publish the point cloud on a different name -->
+    <remap from="points" to="pointcloud"/>
+  </node>
+
+  <!-- This node publishes a static transform between two frames -->
+  <node pkg="tf2_ros" type="static_transform_publisher" name="depth_to_body_link_pub"
+        args="0 0 0 0 0 1.5708 Quadrotor/DepthCamera Quadrotor/Sensors/DepthCamera" />
+  <!-- This node publishes a static transform between two frames -->
+  <node pkg="tf2_ros" type="static_transform_publisher" name="rgb_left_to_body_link_pub"
+        args="0 0 0 0 0 1.5708 Quadrotor/RGBCameraLeft Quadrotor/Sensors/RGBCameraLeft" />
+</launch>
+
