@@ -5,6 +5,9 @@ Repository for Autonomous Systems Final Project
 
 ## Requirements
 
-    - depth_image_proc -> sudo apt install ros-<distro>-image 
+    - depth_image_proc 
+    - octomap
+
+`sudo apt install ros-<distro>-image ros-<distro>-octomap`
 
 ## How to run
