@@ -15,5 +15,7 @@
   <!-- Start trajectory planner (Disabled for now) -->
   <!--include file="$(find basic_waypoint_pkg)/launch/waypoint_mission.launch" /-->
   
+  <!-- Start RViz with our configuration -->
+  <node pkg="rviz" type="rviz" name="rviz" output="screen" args="-d $(find main_launch)/rviz/uav.rviz" />
 
 </launch>

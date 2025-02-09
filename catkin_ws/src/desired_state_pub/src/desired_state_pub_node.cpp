@@ -54,8 +54,8 @@ int main(int argc, char** argv)
     // Set initial orientation to identity quaternion (no rotation)
     transform.rotation.x = 0.0;
     transform.rotation.y = 0.0;
-    transform.rotation.z = 0.0;
-    transform.rotation.w = 1.0;
+    transform.rotation.z = -1.0;
+    transform.rotation.w = 0.0;
 
     // Set initial translation to (-38, 10, 10)
     double x = -38.0;
