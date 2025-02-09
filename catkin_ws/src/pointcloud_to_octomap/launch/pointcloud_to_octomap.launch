@@ -1,0 +1,13 @@
+<launch>
+
+  <node pkg="octomap_server" type="octomap_server_node" name="octomap_server" output="screen">
+    <remap from="/cloud_in" to="pointcloud"/>
+    <param name="frame_id" value="world"/>
+    <param name="resolution" value="0.1"/>
+    <remap from="/octomap_binary" to="/octomap_binary"/>
+    <remap from="/octomap_full" to="/octomap_full"/>
+    <remap from="/occupied_cells_vis_array" to="/occupied_cells_vis_array"/>
+    <remap from="/free_cells_vis_array" to="/free_cells_vis_array"/>
+  </node>
+
+</launch>
