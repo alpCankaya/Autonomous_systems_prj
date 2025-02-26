@@ -11,6 +11,18 @@ from std_msgs.msg import Bool
 import random
 import time
 
+import sys
+import os
+
+# Add the src directory to Python's path
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../src")
+
+from dstar_lite import DStarLite
+from frontier_detector import find_frontiers
+
+
+
+
 class DStarExplorer:
     def __init__(self):
         rospy.init_node('dstar_explorer')
@@ -20,6 +32,9 @@ class DStarExplorer:
         self.frontier_sub = rospy.Subscriber('/frontier_goal', PoseStamped, self.frontier_callback)
         self.true_pose_sub = rospy.Subscriber("/true_pose", PoseStamped, self.true_pose_callback)
         self.lantern_detected_sub = rospy.Subscriber('/lantern_detected', Bool, self.lantern_callback)
+
+        # Path publisher
+        self.path_pub = rospy.Publisher('/dstar_path', Path, queue_size=10)
 
         # Publishers
         self.trajectory_pub = rospy.Publisher('/desired_state', MultiDOFJointTrajectoryPoint, queue_size=10)
@@ -77,17 +92,19 @@ class DStarExplorer:
         return None
 
     def plan_path(self):
-        """Plans a path using D* Lite and publishes it as trajectory_msgs/MultiDOFJointTrajectoryPoint."""
+        """Plans a path using D* Lite and publishes it as a trajectory."""
         if self.current_goal:
             rospy.loginfo(f"Planning path to frontier: {self.current_goal}")
+
+            # Ensure current_goal is always (x, y, z)
+            if len(self.current_goal) == 2:
+                self.current_goal = (self.current_goal[0], self.current_goal[1], 1.0)
+
+            rospy.loginfo(f"✅ DEBUG: Fixed self.current_goal = {self.current_goal} (Tuple)")
+
             path_msg = self.dstar.plan(self.current_goal)
+            self.path_pub.publish(path_msg)
 
-            if not path_msg.poses:
-                rospy.logwarn("Received an empty path from D*. Cannot generate trajectory.")
-                return
-
-            # Convert path to trajectory message
-            self.publish_trajectory(path_msg)
 
     def publish_trajectory(self, path_msg):
         """Converts a received nav_msgs/Path into trajectory_msgs/MultiDOFJointTrajectoryPoint."""
@@ -139,11 +156,17 @@ class DStarExplorer:
             rospy.sleep(3)  # Rotate for 3 seconds
             self.cmd_vel_pub.publish(Twist())  # Stop rotation
             self.last_rotation_time = time.time()
-            
+
     def frontier_callback(self, msg):
         """Updates the D* planner with a new goal from the frontier detector."""
-        self.current_goal = np.array([msg.pose.position.x, msg.pose.position.y, msg.pose.position.z])
+        # Ensure it has (x, y, z)
+        self.current_goal = (msg.pose.position.x, msg.pose.position.y, msg.pose.position.z if msg.pose.position.z else 1.0)
+
+        rospy.loginfo(f"✅ DEBUG: Updated current goal to {self.current_goal}")
+
         self.plan_path()
+
+
 
 
 if __name__ == '__main__':

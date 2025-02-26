@@ -1,19 +1,21 @@
 <launch>
     <arg name="mav_name" default="firefly"/>
 
-        <!--- Trajectory planner -->
-        <node name="planner" pkg="basic_waypoint_pkg" type="basic_waypoint_pkg" output="screen" clear_params = "true">
-            <rosparam command="load" file="$(find basic_waypoint_pkg)/config/trajectory_config.yaml"/>
-        </node>
+    <!--- Predefined Path Planner -->
+    <node name="planner" pkg="basic_waypoint_pkg" type="basic_waypoint_pkg" output="screen" clear_params="true">
+        <rosparam command="load" file="$(find basic_waypoint_pkg)/config/trajectory_config.yaml"/>
+    </node>
 
+    <!--- Trajectory Sampler -->
+    <node name="sampler" pkg="mav_trajectory_generation_ros" type="trajectory_sampler_node" output="screen">
+        <remap from="path_segments_4D" to="trajectory"/>
+        <remap from="/command/trajectory" to="desired_trajectory"/>
+    </node>
 
-        <!--- Trajectory sampler -->
-        <node name="sampler" pkg="mav_trajectory_generation_ros" type="trajectory_sampler_node" output="screen">
-            <remap from="path_segments_4D" to="trajectory"/>
-            <remap from="/command/trajectory" to="desired_trajectory"/>
-        </node>
+    <!--- Trajectory Converter -->
+    <node pkg="basic_waypoint_pkg" type="trajectory_converter" name="trajectory_converter" output="screen"/>
 
-        <!-- Trajectory Converter -->
-        <node pkg="basic_waypoint_pkg" type="trajectory_converter" name="trajectory_converter" output="screen"/>
-
+    <!-- Goal Monitor: Switch to D* Explorer when reaching the goal -->
+    <node name="goal_monitor" pkg="basic_waypoint_pkg" type="switch_to_dstar.py" output="screen"/>
 </launch>
+
