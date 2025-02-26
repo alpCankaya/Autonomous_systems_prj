@@ -24,10 +24,9 @@
     <remap from="/depth_registered/points" to="pointcloud"/>
   </node>
   
-  <!-- Static transforms -->
+<!-- Static transforms -->
   <node pkg="tf2_ros" type="static_transform_publisher" name="depth_to_body_link_pub"
-        args="0 0 0 0 0 -1.5708 Quadrotor/DepthCamera Quadrotor/Sensors/DepthCamera" />
+        args="0 0 0 -1.5708 0 -1.5708 true_body Quadrotor/Sensors/DepthCamera" />
   <node pkg="tf2_ros" type="static_transform_publisher" name="rgb_left_to_body_link_pub"
-        args="0 0 0 0 0 -1.5708 Quadrotor/RGBCameraLeft Quadrotor/Sensors/RGBCameraLeft" />
+        args="0 -0.05 0 -1.5708 0 -1.5708 true_body Quadrotor/Sensors/RGBCameraLeft" />
 </launch>
-

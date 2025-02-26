@@ -65,7 +65,7 @@ bool BasicPlanner::planTrajectory(const Eigen::VectorXd& goal_pos,
 
     // Optimze up to 4th order derivative (SNAP)
     const int derivative_to_optimize =
-            mav_trajectory_generation::derivative_order::SNAP;
+            mav_trajectory_generation::derivative_order::ACCELERATION;
 
     // we have 2 vertices:
     // Start = current position
