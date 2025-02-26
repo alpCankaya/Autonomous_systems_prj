@@ -217,6 +217,7 @@ public:
       tf::Quaternion q;
       tf::quaternionMsgToTF(des_state.transforms[0].rotation , q);
       yawd = tf::getYaw(q);
+      yawd = 180.0;
       // ROS_INFO_NAMED("onDesiredState", "YAW: %f", yawd);
 
       // ~~~~ end solution

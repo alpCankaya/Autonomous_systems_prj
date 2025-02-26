@@ -110,23 +110,23 @@ bool BasicPlanner::planTrajectory(const Eigen::VectorXd& goal_pos,
             }
             waypoint.addConstraint(mav_trajectory_generation::derivative_order::POSITION, position);
 
-            // Add velocity constraint if available
-            if (waypoint_list[i].hasMember("velocity")) {
-                Eigen::Vector3d velocity;
-                for (int j = 0; j < dimension; ++j) {
-                    velocity[j] = static_cast<double>(waypoint_list[i]["velocity"][j]);
-                }
-                waypoint.addConstraint(mav_trajectory_generation::derivative_order::VELOCITY, velocity);
-            }
+            // // Add velocity constraint if available
+            // if (waypoint_list[i].hasMember("velocity")) {
+            //     Eigen::Vector3d velocity;
+            //     for (int j = 0; j < dimension; ++j) {
+            //         velocity[j] = static_cast<double>(waypoint_list[i]["velocity"][j]);
+            //     }
+            //     waypoint.addConstraint(mav_trajectory_generation::derivative_order::VELOCITY, velocity);
+            // }
 
-            // Add acceleration constraint if available
-            if (waypoint_list[i].hasMember("acceleration")) {
-                Eigen::Vector3d acceleration;
-                for (int j = 0; j < dimension; ++j) {
-                    acceleration[j] = static_cast<double>(waypoint_list[i]["acceleration"][j]);
-                }
-                waypoint.addConstraint(mav_trajectory_generation::derivative_order::ACCELERATION, acceleration);
-            }
+            // // Add acceleration constraint if available
+            // if (waypoint_list[i].hasMember("acceleration")) {
+            //     Eigen::Vector3d acceleration;
+            //     for (int j = 0; j < dimension; ++j) {
+            //         acceleration[j] = static_cast<double>(waypoint_list[i]["acceleration"][j]);
+            //     }
+            //     waypoint.addConstraint(mav_trajectory_generation::derivative_order::ACCELERATION, acceleration);
+            // }
 
             // Add waypoint to vertices
             vertices.push_back(waypoint);
