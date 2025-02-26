@@ -74,7 +74,7 @@ class ObjectDepthEstimator:
             
             X = avg_depth  # Depth (Y)
             Y = -(np.mean(selected_pixels[:, 1]) - 160) * avg_depth / 120 
-            Z = (np.mean(selected_pixels[:, 0]) - 120) * avg_depth / 120
+            Z = -(np.mean(selected_pixels[:, 0]) - 120) * avg_depth / 120
 
             object_body_frame = np.array([X, Y, Z])
             rospy.loginfo(f"Object 3D position in body frame: ({X:.2f}, {Y:.2f}, {Z:.2f})")
