@@ -51,10 +51,11 @@ int main(int argc, char** argv)
     trajectory_msgs::MultiDOFJointTrajectoryPoint msg;
     geometry_msgs::Transform transform;
 
-    // Set initial orientation to identity quaternion (no rotation)
+    // Set initial orientation to 180 degrees yawed (around Z-axis)
+    // Yaw of 180 degrees corresponds to rotation.z = 1.0, rotation.w = 0.0
     transform.rotation.x = 0.0;
     transform.rotation.y = 0.0;
-    transform.rotation.z = -1.0;
+    transform.rotation.z = 1.0;  // For 180-degree yaw
     transform.rotation.w = 0.0;
 
     // Set initial translation to (-38, 10, 10)
@@ -77,9 +78,11 @@ int main(int argc, char** argv)
 
     // Set terminal to non-blocking mode
     setNonBlockingMode(true);
-    ROS_INFO("Control started. Use Up Arrow to increment X, Left Arrow to increment Y, 'q' to quit.");
+    ROS_INFO("Control started. Use Up Arrow to increment X, Left Arrow to increment Y, 'q' to quit, 'E' to yaw CW, 'F' to yaw CCW.");
 
     ros::Rate loop_rate(10); // 10 Hz
+
+    double yaw = M_PI; // Initial yaw (180 degrees in radians)
 
     while (ros::ok())
     {
@@ -115,15 +118,6 @@ int main(int argc, char** argv)
                             default:
                                 break;
                         }
-
-                        // Update the message with new x and y
-                        msg.transforms[0].translation.x = x;
-                        msg.transforms[0].translation.y = y;
-                        msg.transforms[0].translation.z = z;
-
-                        // Publish the updated message
-                        pub.publish(msg);
-                        ROS_INFO("Published updated desired state: x=%.2f, y=%.2f, z=%.2f", x, y, z);
                     }
                 }
             }
@@ -132,7 +126,32 @@ int main(int argc, char** argv)
                 ROS_INFO("Quit key pressed. Shutting down node.");
                 break;
             }
+            else if (c == 'E' || c == 'e') // CCW Yaw 
+            {
+                yaw += 0.1; // Increment yaw by 0.1 rad
+                ROS_INFO("Yaw Clockwise pressed: Incremented yaw to %.2f radians", yaw);
+            }
+            else if (c == 'F' || c == 'f') // CW Yaw 
+            {
+                yaw -= 0.1; // Decrement yaw by 0.1 rad
+                ROS_INFO("Yaw Counterclockwise pressed: Decremented yaw to %.2f radians", yaw);
+            }
         }
+
+        // Update the orientation with the new yaw
+        transform.rotation.z = sin(yaw / 2.0);
+        transform.rotation.w = cos(yaw / 2.0);
+
+        // Update the message with new x, y, z, and yaw
+        msg.transforms[0].translation.x = x;
+        msg.transforms[0].translation.y = y;
+        msg.transforms[0].translation.z = z;
+        msg.transforms[0].rotation.z = transform.rotation.z;
+        msg.transforms[0].rotation.w = transform.rotation.w;
+
+        // Publish the updated message
+        pub.publish(msg);
+        ROS_INFO("Published updated desired state: x=%.2f, y=%.2f, z=%.2f, yaw=%.2f", x, y, z, yaw);
 
         ros::spinOnce();
         loop_rate.sleep();
