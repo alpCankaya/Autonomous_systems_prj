@@ -8,7 +8,7 @@ from geometry_msgs.msg import PoseStamped, Twist, Quaternion
 from trajectory_msgs.msg import MultiDOFJointTrajectoryPoint
 from tf.transformations import quaternion_from_euler
 from std_msgs.msg import Bool
-from trajectory_msgs.msg import MultiDOFJointTrajectory, MultiDOFJointTrajectoryPoint
+from trajectory_msgs.msg import MultiDOFJointTrajectory
 from geometry_msgs.msg import Transform
 from tf.transformations import quaternion_matrix  # Import for quaternion to rotation matrix conversion
 

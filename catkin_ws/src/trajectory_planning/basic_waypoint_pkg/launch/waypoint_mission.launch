@@ -15,7 +15,5 @@
     <!--- Trajectory Converter -->
     <node pkg="basic_waypoint_pkg" type="trajectory_converter" name="trajectory_converter" output="screen"/>
 
-    <!-- Goal Monitor: Switch to D* Explorer when reaching the goal -->
-    <node name="goal_monitor" pkg="basic_waypoint_pkg" type="switch_to_dstar.py" output="screen"/>
 </launch>
 
