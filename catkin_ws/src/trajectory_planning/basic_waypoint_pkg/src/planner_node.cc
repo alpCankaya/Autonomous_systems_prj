@@ -25,19 +25,17 @@ int main(int argc, char** argv) {
     BasicPlanner planner(n);  // instantiate basic planner
     ros::Duration(1.0).sleep();
 
-    // define goal point
-    Eigen::Vector3d goal_position, goal_velocity;
-    goal_position << -320.0, 15.0, 17.0;
-    goal_velocity << 0.0, 0.0, 0.0;
-
     for (int i = 0; i < 10; i++) {
         ros::spinOnce();  // process a few messages in the background - causes the uavPoseCallback to happen
     }
 
-    mav_trajectory_generation::Trajectory trajectory;
-    planner.planTrajectory(goal_position, goal_velocity, &trajectory);
-    planner.publishTrajectory(trajectory);
-    ROS_WARN_STREAM("DONE. GOODBYE.");
+    ROS_INFO("Starting planner. It will:");
+    ROS_INFO("1. Follow waypoints from parameter space until signal is received");
+    ROS_INFO("2. After signal, create direct trajectories to goals received on topic");
 
+    // Run the planner - this will handle both modes and run forever
+    planner.run();
+    
+    // This line should never be reached as run() contains an infinite loop
     return 0;
 }
