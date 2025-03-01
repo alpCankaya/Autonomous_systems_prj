@@ -27,7 +27,7 @@ int main(int argc, char** argv) {
 
     // define goal point
     Eigen::Vector3d goal_position, goal_velocity;
-    goal_position << -320.0, 15.0, 17.0;
+    goal_position << -330.0, 10.0, 17.0;
     goal_velocity << 0.0, 0.0, 0.0;
 
     for (int i = 0; i < 10; i++) {

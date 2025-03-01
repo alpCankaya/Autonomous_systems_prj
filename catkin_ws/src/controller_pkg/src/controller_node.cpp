@@ -216,8 +216,10 @@ public:
       
       tf::Quaternion q;
       tf::quaternionMsgToTF(des_state.transforms[0].rotation , q);
-      yawd = tf::getYaw(q);
-      yawd = 180.0;
+      if (vd.norm() > 1e-3) {  // Avoid division by zero if velocity is too small
+        yawd = atan2(vd.y(), vd.x());
+       }
+      // yawd = atan2(vy, v.z);
       // ROS_INFO_NAMED("onDesiredState", "YAW: %f", yawd);
 
       // ~~~~ end solution

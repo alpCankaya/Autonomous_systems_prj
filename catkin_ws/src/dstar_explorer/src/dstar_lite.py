@@ -9,7 +9,7 @@ class DStarLite:
         import rospy
 
         path = Path()
-        path.header.frame_id = "map"
+        path.header.frame_id = "world"
 
         for i in range(10):  # Generate 10 waypoints
             pose = PoseStamped()

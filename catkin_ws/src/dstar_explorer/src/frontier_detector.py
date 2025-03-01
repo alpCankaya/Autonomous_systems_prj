@@ -3,7 +3,7 @@
 import rospy
 import numpy as np
 from octomap_msgs.msg import Octomap
-from nav_msgs.msg import OccupancyGrid
+from nav_msgs.msg import OccupancyGrid, Odometry
 from geometry_msgs.msg import PoseStamped
 from std_msgs.msg import Bool
 from visualization_msgs.msg import Marker, MarkerArray
@@ -64,14 +64,13 @@ def find_frontiers(octomap_msg):
     return frontiers
 
 
-
 class FrontierDetector:
     def __init__(self):
         rospy.init_node('frontier_detector')
 
         # Subscribers
         self.octomap_sub = rospy.Subscriber('/octomap_binary', Octomap, self.map_callback)
-        self.true_pose_sub = rospy.Subscriber("/true_pose", PoseStamped, self.pose_callback)
+        self.current_state_sub = rospy.Subscriber("/current_state_est", Odometry, self.current_state_callback)
 
         # Publishers
         self.frontier_pub = rospy.Publisher('/frontier_goal', PoseStamped, queue_size=10)
@@ -84,9 +83,9 @@ class FrontierDetector:
         self.origin = [0, 0]  # World frame origin
         self.drone_position = None
 
-    def pose_callback(self, msg):
-        """Updates the drone's world position."""
-        self.drone_position = np.array([msg.pose.position.x, msg.pose.position.y])
+    def current_state_callback(self, msg):
+        """Updates the drone's world position from Odometry data."""
+        self.drone_position = np.array([msg.pose.pose.position.x, msg.pose.pose.position.y])
 
     def map_callback(self, msg):
         """Processes the OctoMap, extracts frontiers, and publishes the best one."""
@@ -120,7 +119,6 @@ class FrontierDetector:
 
         self.frontier_pub.publish(goal)
         rospy.loginfo(f"✅ DEBUG: Successfully published frontier goal at ({goal.pose.position.x}, {goal.pose.position.y})")
-
 
     def publish_frontier_markers(self, frontiers):
         """Publishes frontiers as visualization markers in RViz."""
