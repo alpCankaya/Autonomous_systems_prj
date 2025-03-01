@@ -6,8 +6,9 @@ dynamic_params: {
  
 waypoints: {
   vertices: [   
-    #{ position: [ -38.0,  10.0,   6.5] }, # Initial Pose
-    { position: [ -50.0,   0.0,  10.0], velocity: [ 0.0, 0.0, 0.0] }, # First light 
+    { position: [ -38.0,  10.0,   6.5] , velocity: [ 0.0, 0.0, 0.0] }, # Initial Pose
+    { position: [ -38.0,  10.0,   15.0] }, 
+    { position: [ -50.0,   0.0,  10.0] }, # First light 
     { position: [ -70.0, -20.0,  10.0] }, # Avoid Tree
     { position: [ -85.0, -15.0,  10.0] }, 
     { position: [-105.0, -10.0,  10.0] }, # WP1 towards entrance
