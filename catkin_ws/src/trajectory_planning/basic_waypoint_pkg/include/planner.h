@@ -10,6 +10,7 @@
 #include <mav_trajectory_generation_ros/ros_visualization.h>
 #include <mav_trajectory_generation_ros/ros_conversions.h>
 #include <geometry_msgs/Point.h>
+#include <std_msgs/Bool.h>
 
 class BasicPlanner {
 public:
@@ -40,6 +41,7 @@ public:
 private:
     ros::Publisher pub_markers_;
     ros::Publisher pub_trajectory_;
+    ros::Publisher pub_mode_switch_;
     ros::Subscriber sub_odom_;
     ros::Subscriber sub_goal_position_;
 
@@ -58,6 +60,7 @@ private:
     Eigen::Vector3d goal_velocity_;
     
     std::string goal_position_topic_;
+    std::string mode_switch_topic_;
     
     // Trigger point and threshold
     Eigen::Vector3d trigger_point_;

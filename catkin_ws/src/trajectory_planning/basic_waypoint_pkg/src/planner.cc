@@ -38,6 +38,11 @@ BasicPlanner::BasicPlanner(ros::NodeHandle& nh) :
         ROS_WARN("Param 'goal_position_topic' not found; using default: %s", goal_position_topic_.c_str());
     }
     
+    if (!nh_.getParam("/planner/mode_switch_topic", mode_switch_topic_)) {
+        mode_switch_topic_ = "/mode_switch";
+        ROS_WARN("Param 'mode_switch_topic' not found; using default: %s", mode_switch_topic_.c_str());
+    }
+    
     // Set the trigger point
     trigger_point_ << -280.0, -5.0, 12.0;
     
@@ -49,6 +54,13 @@ BasicPlanner::BasicPlanner(ros::NodeHandle& nh) :
     // create publisher for RVIZ markers
     pub_markers_ = nh.advertise<visualization_msgs::MarkerArray>("trajectory_markers", 0);
     pub_trajectory_ = nh.advertise<mav_planning_msgs::PolynomialTrajectory4D>("trajectory", 0);
+    
+    // Create publisher for mode switch with latched=true
+    ros::AdvertiseOptions ao = ros::AdvertiseOptions::create<std_msgs::Bool>(
+        mode_switch_topic_, 1, // topic name, queue_size
+        ros::SubscriberStatusCallback(), ros::SubscriberStatusCallback(), // connect_cb, disconnect_cb
+        ros::VoidConstPtr(), NULL); // tracked_object, latched=true
+    pub_mode_switch_ = nh.advertise(ao);
 
     // subscriber for Odometry
     sub_odom_ = nh.subscribe("/current_state_est", 1, &BasicPlanner::uavOdomCallback, this);
@@ -72,6 +84,12 @@ void BasicPlanner::uavOdomCallback(const nav_msgs::Odometry::ConstPtr& odom) {
     if (!mode_switched_ && isNearTriggerPoint()) {
         ROS_INFO("Reached trigger point! Switching to goal-based mode");
         mode_switched_ = true;
+        
+        // Publish mode switch message (latched)
+        std_msgs::Bool mode_msg;
+        mode_msg.data = true;
+        pub_mode_switch_.publish(mode_msg);
+        ROS_INFO("Published mode switch message to %s", mode_switch_topic_.c_str());
     }
 }
 
@@ -131,6 +149,13 @@ bool BasicPlanner::planTrajectory(const Eigen::VectorXd& goal_pos,
     // Only add waypoints from parameter space if mode has not been switched
     if (!mode_switched_) {
         ROS_INFO("Using waypoints from parameter space");
+
+        // Publish mode switch message (latched)
+        std_msgs::Bool mode_msg;
+        mode_msg.data = false;
+        pub_mode_switch_.publish(mode_msg);
+        ROS_INFO("Published mode switch message to %s", mode_switch_topic_.c_str());
+
         XmlRpc::XmlRpcValue waypoint_list;
         if (nh_.getParam("/planner/waypoints/vertices", waypoint_list)) {
             // Parse the waypoints
