@@ -44,7 +44,7 @@ BasicPlanner::BasicPlanner(ros::NodeHandle& nh) :
     }
     
     // Set the trigger point
-    trigger_point_ << -280.0, -5.0, 12.0;
+    trigger_point_ << -320.0, -5.0, 17.0;
     
     // Get trigger distance threshold from parameter if available
     if (!nh_.getParam("/planner/trigger_distance_threshold", trigger_distance_threshold_)) {
