@@ -60,9 +60,9 @@ Visualization Manager:
       Channel Name: intensity
       Class: rviz/PointCloud2
       Color: 255; 255; 255
-      Color Transformer: RGB8
+      Color Transformer: Intensity
       Decay Time: 0
-      Enabled: true
+      Enabled: false
       Invert Rainbow: false
       Max Color: 255; 255; 255
       Min Color: 0; 0; 0
@@ -77,15 +77,15 @@ Visualization Manager:
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
-      Value: true
+      Value: false
     - Class: rviz/MarkerArray
-      Enabled: false
+      Enabled: true
       Marker Topic: /occupied_cells_vis_array
       Name: occupied_cells
       Namespaces:
-        {}
+        map: true
       Queue Size: 100
-      Value: false
+      Value: true
     - Class: rviz/MarkerArray
       Enabled: false
       Marker Topic: /free_cells_vis_array
@@ -130,25 +130,26 @@ Visualization Manager:
   Value: true
   Views:
     Current:
-      Class: rviz/FrameAligned
+      Class: rviz/XYOrbit
+      Distance: 43.04428482055664
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
+      Field of View: 0.7853981852531433
+      Focal Point:
+        X: 17.378454208374023
+        Y: -2.944293737411499
+        Z: -9.970199584960938
+      Focal Shape Fixed Size: true
+      Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
-      Lock Camera: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: -1.570796251296997
-      Point towards: +z axis
-      Position:
-        X: 0
-        Y: 0
-        Z: -9.59999942779541
-      Roll: 0
-      Target Frame: Quadrotor/Sensors/DepthCamera
-      Yaw: 0
+      Pitch: 0.49119365215301514
+      Target Frame: body
+      Yaw: 0.16539517045021057
     Saved:
       - Class: rviz/FrameAligned
         Enable Stereo Rendering:
@@ -224,4 +225,4 @@ Window Geometry:
     collapsed: false
   Width: 1848
   X: 72
-  Y: 1227
+  Y: 313
