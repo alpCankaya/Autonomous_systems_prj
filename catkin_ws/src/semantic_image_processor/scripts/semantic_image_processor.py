@@ -95,7 +95,7 @@ class ObjectDepthEstimator:
 
     def track_object(self, object_world_frame):
         """Tracks object positions and filters stable detections using unique object IDs."""
-        threshold = 1.0  # Distance threshold for associating detections with existing objects
+        threshold = 30 # Distance threshold for associating detections with existing objects
         
         associated_object_id = None
         
@@ -117,12 +117,12 @@ class ObjectDepthEstimator:
         self.tracked_objects[associated_object_id].append(object_world_frame)
 
         # Keep last 5 detections for this object.
-        if len(self.tracked_objects[associated_object_id]) > 5:
+        if len(self.tracked_objects[associated_object_id]) > 10:
             self.tracked_objects[associated_object_id].pop(0)
 
         # Check stability: if 5 detections exist and they are within threshold, log and save the stable object.
         positions = np.array(self.tracked_objects[associated_object_id])
-        if positions.shape[0] == 5:
+        if positions.shape[0] == 10:
             diffs = np.max(positions, axis=0) - np.min(positions, axis=0)
             if np.all(diffs <= threshold):
                 avg_position = np.mean(positions, axis=0)
