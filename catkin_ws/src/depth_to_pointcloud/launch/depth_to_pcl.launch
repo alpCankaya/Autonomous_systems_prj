@@ -12,7 +12,7 @@
   
 <!-- Static transforms -->
   <node pkg="tf2_ros" type="static_transform_publisher" name="depth_to_true_link_pub"
-        args="0 0 0 -1.5708 0 -1.5708 true_body Quadrotor/TrueStaet" />
+        args="0 0 0 -1.5708 0 -1.5708 true_body Quadrotor/TrueState" />
   <node pkg="tf2_ros" type="static_transform_publisher" name="depth_to_body_link_pub"
         args="0 0 0 -1.5708 0 -1.5708 true_body Quadrotor/Sensors/DepthCamera" />
   <node pkg="tf2_ros" type="static_transform_publisher" name="rgb_left_to_body_link_pub"
