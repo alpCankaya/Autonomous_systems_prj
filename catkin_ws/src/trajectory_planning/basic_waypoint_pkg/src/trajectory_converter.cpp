@@ -8,10 +8,10 @@ bool new_goal_flag = false; // default false
 
 // Callback for /desired_trajectory
 void trajectoryCallback(const trajectory_msgs::MultiDOFJointTrajectory::ConstPtr& traj_msg) {
-    if (!new_goal_flag) {
+    /*if (!new_goal_flag) {
         ROS_WARN_THROTTLE(5.0, "No new goal - ignoring incoming trajectory");
         return;
-    }
+    }*/
 
     // If flag is true, publish the points
     for (const auto& point : traj_msg->points) {
@@ -23,9 +23,9 @@ void trajectoryCallback(const trajectory_msgs::MultiDOFJointTrajectory::ConstPtr
 void newGoalFlagCallback(const std_msgs::Bool::ConstPtr& msg) {
     new_goal_flag = msg->data;
     if (new_goal_flag) {
-        ROS_INFO("Trajectory Converter: new goal flag is TRUE.");
+        ROS_INFO_THROTTLE(15.0,"Trajectory Converter: new goal flag is TRUE.");
     } else {
-        ROS_INFO("Trajectory Converter: new goal flag is FALSE.");
+        ROS_INFO_THROTTLE(15.0,"Trajectory Converter: new goal flag is FALSE.");
     }
 }
 int main(int argc, char** argv) {

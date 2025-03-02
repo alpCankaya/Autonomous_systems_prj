@@ -344,8 +344,8 @@ void BasicPlanner::run() {
                 }
             } 
             else {
-                // No new goal => fallback
-                publishFallbackTrajectory();
+                /*// No new goal => fallback
+                publishFallbackTrajectory();*/
 
                 // This fallback might not produce a real trajectory for the converter
                 // or you might want to set the flag to false if there's no "valid" new path
