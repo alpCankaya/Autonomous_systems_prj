@@ -5,7 +5,7 @@ This repository contains ROS packages for autonomous drone exploration using Uni
 #Group Members
 - Esra Kaplan Yılmaz: Navigation (Path Planning, Trajectory Generation, Manual Flight), Vision (Point Cloud Generation, Frontier Exploration, Octomapping),
 - Alp Çankaya: Navigation (Path Planning, Trajectory Generation, Manual Flight), Vision (Point Cloud Generation, Frontier Exploration, Octomapping),  
-- 
+- Erdem Ekinci: Navigation (Manual Flight), Vision (Point Cloud Generation, Lantern Detection & Logging)  
 # Overview
 
 
