@@ -40,7 +40,7 @@ git clone git@github.com:alpCankaya/Autonomous_systems_prj.git
 Open a terminal and navigate to 
 
 
-## Requirements
+## Dependencies 
 The **depth_image_proc** package has been utilized for generating the Point Cloud. 
 ```bash
 sudo apt install ros-noetic-depth-image-proc 
@@ -57,4 +57,15 @@ sudo apt-get install ros-noetic-octomap ros-noetic-octomap-mapping
 
 ## How to run
 
-`roslaunch main_launch main.launch` 
+Clone the repostitory: 
+```bash
+git clone git@github.com:alpCankaya/Autonomous_systems_prj.git 
+```
+Open a terminal and navigate to 
+
+## Launching the Simulation 
+To run the simulation: 
+```bash
+roslaunch main_launch main.launch
+```
+
