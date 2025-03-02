@@ -18,4 +18,7 @@
   <!-- Start RViz with our configuration -->
   <node pkg="rviz" type="rviz" name="rviz" output="screen" args="-d $(find main_launch)/rviz/uav.rviz" />
 
+  <!-- Run semantic_image_processor -->
+  <node pkg="semantic_image_processor" type="semantic_image_processor.py" name="semantic_image_processor" output="screen" />
+  
 </launch>
