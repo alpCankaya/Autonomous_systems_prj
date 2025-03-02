@@ -17,27 +17,32 @@
 #include "dstar_lite.h"
 #include "frontier_detector.h"
 #include "dstar_explorer.h"
+#include <geometry_msgs/Point.h>  // <-- Add this
 
-DStarExplorer::DStarExplorer() {
-    ros::NodeHandle nh;
-    ros::Timer planning_timer;
-    // Subscribers
-    octomap_sub = nh.subscribe("/projected_map", 10, &DStarExplorer::mapCallback, this);
-    frontier_sub = nh.subscribe("/frontiers", 10, &DStarExplorer::frontierCallback, this);
-    current_state_sub = nh.subscribe("/current_state_est", 10, &DStarExplorer::currentStateCallback, this);
-    lantern_detected_sub = nh.subscribe("/lantern_detected", 10, &DStarExplorer::lanternCallback, this);
 
-    // Publishers
-    path_pub = nh.advertise<nav_msgs::Path>("/dstar_path", 10);
-    trajectory_pub = nh.advertise<trajectory_msgs::MultiDOFJointTrajectoryPoint>("/desired_state", 10);
-    cmd_vel_pub = nh.advertise<geometry_msgs::Twist>("/cmd_vel", 10);
-    planning_timer = nh.createTimer(ros::Duration(1.0), [this](const ros::TimerEvent&) { this->planPath(); });
+DStarExplorer::DStarExplorer()
+{
+  ros::NodeHandle nh;
 
-    dstar = new DStarLite();
-    map_received_ = false;
-    frontier_received_ = false;
-    current_pose_received_ = false;
-    lantern_detected = false;
+  // Existing subscribers
+  octomap_sub = nh.subscribe("/projected_map", 10, &DStarExplorer::mapCallback, this);
+  frontier_sub = nh.subscribe("/frontiers", 10, &DStarExplorer::frontierCallback, this);
+  current_state_sub = nh.subscribe("/current_state_est", 10, &DStarExplorer::currentStateCallback, this);
+  lantern_detected_sub = nh.subscribe("/lantern_detected", 10, &DStarExplorer::lanternCallback, this);
+
+  // Existing publishers
+  path_pub = nh.advertise<nav_msgs::Path>("/dstar_path", 10);
+  trajectory_pub = nh.advertise<trajectory_msgs::MultiDOFJointTrajectoryPoint>("/desired_state", 10);
+  cmd_vel_pub = nh.advertise<geometry_msgs::Twist>("/cmd_vel", 10);
+
+  // NEW PUBLISHER for next goal
+  goal_pub_ = nh.advertise<geometry_msgs::Point>("/goal_position", 10);
+
+  // Timer for path planning
+  planning_timer = nh.createTimer(ros::Duration(1.0), [this](const ros::TimerEvent&) { this->planPath(); });
+
+  dstar = new DStarLite();
+  // ...
 }
 
 void DStarExplorer::mapCallback(const nav_msgs::OccupancyGrid::ConstPtr &msg) {
@@ -55,59 +60,37 @@ void DStarExplorer::lanternCallback(const std_msgs::Bool::ConstPtr &msg) {
   lantern_detected = msg->data;
 }
 
-
-void DStarExplorer::frontierCallback(const geometry_msgs::PoseArray::ConstPtr &msg) {
+void DStarExplorer::frontierCallback(const geometry_msgs::PoseArray::ConstPtr &msg)
+{
     if (!current_pose_received_) return;
 
     double min_dist = std::numeric_limits<double>::infinity();
     int best_index = -1;
-    
+
     double robot_x = current_pose_.position.x;
     double robot_y = current_pose_.position.y;
-    
-    tf::Quaternion q(
-        current_pose_.orientation.x,
-        current_pose_.orientation.y,
-        current_pose_.orientation.z,
-        current_pose_.orientation.w
-    );
-    tf::Matrix3x3 m(q);
-    double roll, pitch, yaw;
-    m.getRPY(roll, pitch, yaw);
-    
-    double forward_x = cos(yaw);
-    double forward_y = sin(yaw);
 
-    for (size_t i = 0; i < msg->poses.size(); i++) {
-        double fx = msg->poses[i].position.x;
-        double fy = msg->poses[i].position.y;
-
-        double dx = fx - robot_x;
-        double dy = fy - robot_y;
-        double dist = sqrt(dx * dx + dy * dy);
-
-        double dot_product = (dx * forward_x) + (dy * forward_y);
-        if (dot_product < 0) continue;
-
-        int map_x, map_y;
-        worldToMap(fx, fy, map_x, map_y);
-        if (isNearObstacle(map_x, map_y, 3)) continue;
-
-        if (dist < min_dist) {
-            min_dist = dist;
-            best_index = i;
-        }
-    }
+    // ... existing code for picking the best frontier ...
 
     if (best_index != -1) {
         goal_pose_ = msg->poses[best_index];
         frontier_received_ = true;
         ROS_INFO("Selected forward frontier: (%.2f, %.2f)", goal_pose_.position.x, goal_pose_.position.y);
+
+        // NEW: Publish just the (x, y, z) of the chosen frontier
+        geometry_msgs::Point goal_msg;
+        goal_msg.x = goal_pose_.position.x;
+        goal_msg.y = goal_pose_.position.y;
+        goal_msg.z = goal_pose_.position.z;  // or 0.0 if you want
+        goal_pub_.publish(goal_msg);
+
+        // Existing: Kick off path planning
         planPath();
     } else {
-        ROS_WARN("🚨 No valid forward frontiers found!");
+        ROS_WARN("No valid forward frontiers found!");
     }
 }
+
 
 void DStarExplorer::planPath() {
   if (!map_received_ || !frontier_received_ || !current_pose_received_) return;

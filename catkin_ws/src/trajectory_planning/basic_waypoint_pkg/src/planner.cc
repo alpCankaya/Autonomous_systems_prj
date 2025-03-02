@@ -44,7 +44,7 @@ BasicPlanner::BasicPlanner(ros::NodeHandle& nh) :
     }
     
     // Set the trigger point
-    trigger_point_ << -320.0, 2.0, 17.0;
+    trigger_point_ << -320.0, 5.0, 17.0;
     
     // Get trigger distance threshold from parameter if available
     if (!nh_.getParam("/planner/trigger_distance_threshold", trigger_distance_threshold_)) {
@@ -61,7 +61,7 @@ BasicPlanner::BasicPlanner(ros::NodeHandle& nh) :
         ros::SubscriberStatusCallback(), ros::SubscriberStatusCallback(), // connect_cb, disconnect_cb
         ros::VoidConstPtr(), NULL); // tracked_object, latched=true
     pub_mode_switch_ = nh.advertise(ao);
-
+    fallback_pub_ = nh.advertise<trajectory_msgs::MultiDOFJointTrajectoryPoint>("/desired_state", 1);
     // subscriber for Odometry
     sub_odom_ = nh.subscribe("/current_state_est", 1, &BasicPlanner::uavOdomCallback, this);
     
@@ -84,7 +84,7 @@ void BasicPlanner::uavOdomCallback(const nav_msgs::Odometry::ConstPtr& odom) {
     if (!mode_switched_ && isNearTriggerPoint()) {
         ROS_INFO("Reached trigger point! Switching to goal-based mode");
         mode_switched_ = true;
-        
+        goal_position_ = current_pose_.translation();
         // Publish mode switch message (latched)
         std_msgs::Bool mode_msg;
         mode_msg.data = true;
@@ -271,39 +271,71 @@ void BasicPlanner::goalPositionCallback(const geometry_msgs::Point::ConstPtr& go
     }
 }
 
+void BasicPlanner::publishFallbackTrajectory() {
+    // This example publishes a static pose similar to your fallback code snippet.
+    trajectory_msgs::MultiDOFJointTrajectoryPoint msg;
+    tf::Vector3 origin(-320, 5, 17);
+    tf::Vector3 displacement(0, 0, 0);  // For STATIC_POSE mode
+
+    tf::Transform desired_pose(tf::Transform::getIdentity());
+    desired_pose.setOrigin(origin + displacement);
+    tf::Quaternion q;
+    q.setRPY(0, 0, 0);
+    desired_pose.setRotation(q);
+
+    // Populate the message with desired_pose (convert from tf to message types)
+    msg.transforms.resize(1);
+    msg.transforms[0].translation.x = desired_pose.getOrigin().x();
+    msg.transforms[0].translation.y = desired_pose.getOrigin().y();
+    msg.transforms[0].translation.z = desired_pose.getOrigin().z();
+    msg.transforms[0].rotation.x = desired_pose.getRotation().x();
+    msg.transforms[0].rotation.y = desired_pose.getRotation().y();
+    msg.transforms[0].rotation.z = desired_pose.getRotation().z();
+    msg.transforms[0].rotation.w = desired_pose.getRotation().w();
+
+    // Optionally, you can set velocity/acceleration to zero
+    geometry_msgs::Twist zero_twist;
+    zero_twist.linear.x = zero_twist.linear.y = zero_twist.linear.z = 0;
+    zero_twist.angular.x = zero_twist.angular.y = zero_twist.angular.z = 0;
+    msg.velocities.resize(1, zero_twist);
+    msg.accelerations.resize(1, zero_twist);
+
+    // Publish the fallback desired state
+    fallback_pub_.publish(msg);
+    ROS_INFO("Published fallback desired state at static pose.");
+}
+
+
 // Main run method to handle both modes
 void BasicPlanner::run() {
     ros::Rate rate(10); // 10 Hz
     bool param_trajectory_published = false;
     
     while (ros::ok()) {
-        // Mode 1: Follow path from parameter space (only once)
         if (!mode_switched_ && !param_trajectory_published) {
-            ROS_INFO("Mode 1: Following path from parameter space");
-            
-            // Plan and publish trajectory using waypoints from parameter space
+            // Declare trajectory variable before using it
             mav_trajectory_generation::Trajectory trajectory;
             if (planTrajectory(goal_position_, goal_velocity_, &trajectory)) {
                 publishTrajectory(trajectory);
-                ROS_INFO("Published trajectory from parameter space");
                 param_trajectory_published = true;
             }
-        }
-        
-        // Mode 2: Process goals from goal_position_topic
-        if (mode_switched_ && new_goal_received_) {
-            ROS_INFO("Mode 2: Processing new goal from topic");
-            
-            // Plan and publish trajectory to the new goal
-            mav_trajectory_generation::Trajectory trajectory;
-            if (planTrajectory(goal_position_, goal_velocity_, &trajectory)) {
-                publishTrajectory(trajectory);
-                ROS_INFO("Published trajectory to new goal");
-                new_goal_received_ = false; // Reset flag after processing
+        } 
+        else if (mode_switched_) {
+            if (new_goal_received_) {
+                // Declare trajectory variable here as well
+                mav_trajectory_generation::Trajectory trajectory;
+                if (planTrajectory(goal_position_, goal_velocity_, &trajectory)) {
+                    publishTrajectory(trajectory);
+                    new_goal_received_ = false;
+                }
+            } 
+            else {
+                // Fallback: No new goal, so publish a default desired state
+                publishFallbackTrajectory();
             }
         }
-        
         ros::spinOnce();
         rate.sleep();
     }
 }
+
