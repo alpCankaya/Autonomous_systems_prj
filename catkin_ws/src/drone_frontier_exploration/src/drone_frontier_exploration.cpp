@@ -23,7 +23,6 @@
 #include <pcl/point_types.h>
 #include <vector>
 
-
 class DroneFrontierExploration {
 public:
   /**
@@ -286,23 +285,28 @@ bool DroneFrontierExploration::isFrontierPoint(const octomap::point3d &coordinat
       {1, 1, -1},  {-1, -1, 1},  {1, -1, -1}, {-1, 1, 1}
   };
 
+  int unknown_count = 0;
   // Check all neighboring cells
   for (const auto &offset : neighbor_offsets) {
     // Calculate neighbor coordinate adjusted by octomap resolution
-    octomap::point3d neighbor_coordinate =
-        coordinate + offset * octomap_resolution_;
+    octomap::point3d neighbor_coordinate = coordinate + offset * octomap_resolution_;
         
     // Search for the node in the octomap
     octomap::OcTreeNode *node = octomap_tree_->search(neighbor_coordinate);
-    
-    // If the node doesn't exist (is unknown space), this is a frontier point
+        
+    // If the node doesn't exist (is unknown space), count it as unknown
     if (!node) {
-      return true;
+      unknown_count++;
     }
   }
   
-  // If all neighbors are known (either occupied or free), it's not a frontier
-  return false;
+  // Eğer bilinmeyen komşu sayısı eşik değerden (örneğin 3) büyükse, bu bir junction noktası olarak kabul edilebilir
+  if (unknown_count >= 3) {
+    ROS_INFO("FIND IT");
+  }
+  
+  // Orijinal mantık: en az bir bilinmeyen komşu varsa frontier olarak kabul et
+  return (unknown_count > 0);
 }
 
 void DroneFrontierExploration::publishExplorationGoal(const pcl::PointXYZ &goal_point) {
@@ -329,3 +333,4 @@ int main(int argc, char **argv) {
   ros::spin();
   return 0;
 }
+
