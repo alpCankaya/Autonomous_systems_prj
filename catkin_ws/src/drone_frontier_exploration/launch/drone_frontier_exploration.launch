@@ -1,0 +1,4 @@
+<launch>
+  <node pkg="drone_frontier_exploration" type="drone_frontier_exploration" name="drone_frontier_exploration" 
+        respawn="true" respawn_delay="5.0" />
+</launch>

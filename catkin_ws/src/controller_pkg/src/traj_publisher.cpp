@@ -26,7 +26,7 @@ int main(int argc, char **argv)
 
     int count = 0;
     while (ros::ok()) {
-        tf::Vector3 origin(-38,10,6.5);
+        tf::Vector3 origin(-320,15,15);
 
         double t = (ros::Time::now()-start).toSec();
 
