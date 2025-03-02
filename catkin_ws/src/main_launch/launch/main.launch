@@ -11,6 +11,9 @@
 
   <!-- Start trajectory planner -->
   <include file="$(find basic_waypoint_pkg)/launch/waypoint_mission.launch" />
+  
+  <!-- Run semantic_image_processor -->
+  <node pkg="semantic_image_processor" type="semantic_image_processor.py" name="semantic_image_processor" output="screen" />
 
   <!-- Start drone frontier exploration  -->
   <include file="$(find drone_frontier_exploration)/launch/drone_frontier_exploration.launch" />
