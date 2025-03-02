@@ -6,7 +6,7 @@ This repository contains ROS packages for autonomous drone exploration using Uni
 - Esra Kaplan Yılmaz: Navigation (Path Planning, Trajectory Generation, Manual Flight), Vision (Point Cloud Generation, Frontier Exploration, Octomapping),
 - Alp Çankaya: Navigation (Path Planning, Trajectory Generation, Manual Flight), Vision (Point Cloud Generation, Frontier Exploration, Octomapping),  
 - 
-#Overview
+# Overview
 
 
 # Installation
@@ -16,7 +16,14 @@ Follow [this guide to install ROS Noetic](http://wiki.ros.org/noetic/Installatio
 
 ```bash 
 sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
-``` 
+```
+```bash 
+sudo apt install curl
+```
+```bash 
+curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.key | sudo apt-key add -
+```
+
 Clone the repostitory: 
 ``` ```
 
