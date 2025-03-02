@@ -31,6 +31,7 @@ Clone the repostitory:
 
     - depth_image_proc 
     - octomap
+    - opencv2
 
 `sudo apt install ros-<distro>-image ros-<distro>-octomap`
 
