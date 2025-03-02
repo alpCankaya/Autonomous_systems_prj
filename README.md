@@ -62,9 +62,22 @@ Clone the repostitory:
 git clone git@github.com:alpCankaya/Autonomous_systems_prj.git 
 ```
 Open a terminal and navigate to 
+```bash
+cd catkin_ws 
+```
+Run the below commands to build the code: 
+```bash
+catkin init
+```
+```bash
+catkin build
+```
+```bash
+source devel/setup.bash
+```
 
 ## Launching the Simulation 
-To run the simulation: 
+To run the simulation in terminal: 
 ```bash
 roslaunch main_launch main.launch
 ```
