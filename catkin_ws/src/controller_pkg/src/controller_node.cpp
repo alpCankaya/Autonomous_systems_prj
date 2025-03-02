@@ -62,7 +62,7 @@ class controllerNode{
   //
   // ~~~~ begin solution
 
-  ros::Subscriber desired_state, current_state;
+  ros::Subscriber desired_state, current_state, desired_state_hold;
   ros::Publisher prop_speeds;
   ros::Timer timer;
 
@@ -131,6 +131,9 @@ public:
       // ~~~~ begin solution
       
       desired_state = nh.subscribe("desired_state", 1, &controllerNode::onDesiredState, this);
+      desired_state_hold = nh.subscribe("desired_state_hold", 1, &controllerNode::onDesiredState, this);
+      
+
       current_state = nh.subscribe("current_state_est", 1, &controllerNode::onCurrentState, this);
       prop_speeds = nh.advertise<mav_msgs::Actuators>("rotor_speed_cmds", 1);
       timer = nh.createTimer(ros::Rate(hz), &controllerNode::controlLoop, this);

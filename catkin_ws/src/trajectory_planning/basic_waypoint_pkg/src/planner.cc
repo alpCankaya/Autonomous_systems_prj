@@ -1,5 +1,5 @@
 #include <planner.h>
-
+#include <std_msgs/Bool.h>
 BasicPlanner::BasicPlanner(ros::NodeHandle& nh) :
         nh_(nh),
         max_v_(0.2),
@@ -55,13 +55,16 @@ BasicPlanner::BasicPlanner(ros::NodeHandle& nh) :
     pub_markers_ = nh.advertise<visualization_msgs::MarkerArray>("trajectory_markers", 0);
     pub_trajectory_ = nh.advertise<mav_planning_msgs::PolynomialTrajectory4D>("trajectory", 0);
     
+    // Publisher for new_goal_flag
+    new_goal_flag_pub_ = nh_.advertise<std_msgs::Bool>("/new_goal_flag", 1);
+
     // Create publisher for mode switch with latched=true
     ros::AdvertiseOptions ao = ros::AdvertiseOptions::create<std_msgs::Bool>(
         mode_switch_topic_, 1, // topic name, queue_size
         ros::SubscriberStatusCallback(), ros::SubscriberStatusCallback(), // connect_cb, disconnect_cb
         ros::VoidConstPtr(), NULL); // tracked_object, latched=true
     pub_mode_switch_ = nh.advertise(ao);
-    fallback_pub_ = nh_.advertise<trajectory_msgs::MultiDOFJointTrajectoryPoint>("/desired_state", 1, true);
+    fallback_pub_ = nh_.advertise<trajectory_msgs::MultiDOFJointTrajectoryPoint>("/desired_state_hold", 1, true);
     // subscriber for Odometry
     sub_odom_ = nh.subscribe("/current_state_est", 1, &BasicPlanner::uavOdomCallback, this);
     
@@ -273,13 +276,6 @@ void BasicPlanner::goalPositionCallback(const geometry_msgs::Point::ConstPtr& go
 #include <cstdlib>  // for system()
 
 void BasicPlanner::publishFallbackTrajectory() {
-    // Kill the conflicting node
-    int ret = system("rosnode kill /trajectory_converter");
-    if(ret == 0) {
-        ROS_INFO("Successfully killed /trajectory_converter node.");
-    } else {
-        ROS_WARN("Failed to kill /trajectory_converter node.");
-    }
 
     // Now publish the fallback desired state
     trajectory_msgs::MultiDOFJointTrajectoryPoint msg;
@@ -316,32 +312,50 @@ void BasicPlanner::publishFallbackTrajectory() {
 void BasicPlanner::run() {
     ros::Rate rate(10); // 10 Hz
     bool param_trajectory_published = false;
-    
+
     while (ros::ok()) {
         if (!mode_switched_ && !param_trajectory_published) {
-            // Declare trajectory variable before using it
+            // Plan trajectory using param waypoints
             mav_trajectory_generation::Trajectory trajectory;
             if (planTrajectory(goal_position_, goal_velocity_, &trajectory)) {
                 publishTrajectory(trajectory);
                 param_trajectory_published = true;
+
+                // We have a valid new trajectory from parameters => publish true
+                std_msgs::Bool flag_msg;
+                flag_msg.data = true;
+                new_goal_flag_pub_.publish(flag_msg);
             }
         } 
         else if (mode_switched_) {
             if (new_goal_received_) {
-                // Declare trajectory variable here as well
+                // Plan trajectory for the newly received goal
                 mav_trajectory_generation::Trajectory trajectory;
                 if (planTrajectory(goal_position_, goal_velocity_, &trajectory)) {
                     publishTrajectory(trajectory);
+                    
+                    // We just used up the new goal
                     new_goal_received_ = false;
+
+                    // Publish new_goal_flag = true
+                    std_msgs::Bool flag_msg;
+                    flag_msg.data = true;
+                    new_goal_flag_pub_.publish(flag_msg);
                 }
             } 
             else {
-                // Fallback: No new goal, so publish a default desired state
+                // No new goal => fallback
                 publishFallbackTrajectory();
+
+                // This fallback might not produce a real trajectory for the converter
+                // or you might want to set the flag to false if there's no "valid" new path
+                std_msgs::Bool flag_msg;
+                flag_msg.data = false;
+                new_goal_flag_pub_.publish(flag_msg);
             }
         }
+
         ros::spinOnce();
         rate.sleep();
     }
 }
-

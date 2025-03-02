@@ -16,4 +16,3 @@
     <node pkg="basic_waypoint_pkg" type="trajectory_converter" name="trajectory_converter" output="screen"/>
 
 </launch>
-
