@@ -9,9 +9,9 @@ from geometry_msgs.msg import PoseStamped
 from tf.transformations import quaternion_matrix
 import os
 
-class ObjectDepthEstimator:
+class ObjectDetection:
     def __init__(self):
-        rospy.init_node('object_depth_estimator', anonymous=True)
+        rospy.init_node('object_detection')
         
         self.bridge = CvBridge()
         self.semantic_image = None
@@ -141,5 +141,5 @@ class ObjectDepthEstimator:
         rospy.spin()
 
 if __name__ == "__main__":
-    estimator = ObjectDepthEstimator()
+    estimator = ObjectDetection()
     estimator.run()
