@@ -33,9 +33,12 @@ sudo apt install ros-noetic-desktop-full
 sudo apt install python-rosdep python-rosinstall python-rosinstall-generator python-wstool build-essential
 ```
 
-
 Clone the repostitory: 
-``` ```
+```bash
+git clone git@github.com:alpCankaya/Autonomous_systems_prj.git 
+```
+Open a terminal and navigate to 
+
 
 ## Requirements
 
