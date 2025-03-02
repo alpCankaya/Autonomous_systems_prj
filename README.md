@@ -2,7 +2,7 @@
 # 1. Introduction
 This is a project for the course LRG6300: Autonomous Systems at the Technical University of Munich.
 This repository contains ROS packages for autonomous drone exploration using Unity in an unknown cave environment. The drone utilizes depth camera data to generate a point cloud, which is converted into a 3D Voxel Grid using the OctoMap library.
-#Group Members
+## Group Members
 - Esra Kaplan Yılmaz: Navigation (Path Planning, Trajectory Generation, Manual Flight), Vision (Point Cloud Generation, Frontier Exploration, Octomapping),
 - Alp Çankaya: Navigation (Path Planning, Trajectory Generation, Manual Flight), Vision (Point Cloud Generation, Frontier Exploration, Octomapping),  
 - Erdem Ekinci: Navigation (Manual Flight), Vision (Point Cloud Generation, Lantern Detection & Logging)  
