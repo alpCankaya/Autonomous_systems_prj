@@ -61,7 +61,7 @@ BasicPlanner::BasicPlanner(ros::NodeHandle& nh) :
         ros::SubscriberStatusCallback(), ros::SubscriberStatusCallback(), // connect_cb, disconnect_cb
         ros::VoidConstPtr(), NULL); // tracked_object, latched=true
     pub_mode_switch_ = nh.advertise(ao);
-    fallback_pub_ = nh.advertise<trajectory_msgs::MultiDOFJointTrajectoryPoint>("/desired_state", 1);
+    fallback_pub_ = nh_.advertise<trajectory_msgs::MultiDOFJointTrajectoryPoint>("/desired_state", 1, true);
     // subscriber for Odometry
     sub_odom_ = nh.subscribe("/current_state_est", 1, &BasicPlanner::uavOdomCallback, this);
     
@@ -270,9 +270,18 @@ void BasicPlanner::goalPositionCallback(const geometry_msgs::Point::ConstPtr& go
         new_goal_received_ = true;
     }
 }
+#include <cstdlib>  // for system()
 
 void BasicPlanner::publishFallbackTrajectory() {
-    // This example publishes a static pose similar to your fallback code snippet.
+    // Kill the conflicting node
+    int ret = system("rosnode kill /trajectory_converter");
+    if(ret == 0) {
+        ROS_INFO("Successfully killed /trajectory_converter node.");
+    } else {
+        ROS_WARN("Failed to kill /trajectory_converter node.");
+    }
+
+    // Now publish the fallback desired state
     trajectory_msgs::MultiDOFJointTrajectoryPoint msg;
     tf::Vector3 origin(-320, 5, 17);
     tf::Vector3 displacement(0, 0, 0);  // For STATIC_POSE mode
@@ -283,7 +292,6 @@ void BasicPlanner::publishFallbackTrajectory() {
     q.setRPY(0, 0, 0);
     desired_pose.setRotation(q);
 
-    // Populate the message with desired_pose (convert from tf to message types)
     msg.transforms.resize(1);
     msg.transforms[0].translation.x = desired_pose.getOrigin().x();
     msg.transforms[0].translation.y = desired_pose.getOrigin().y();
@@ -293,18 +301,16 @@ void BasicPlanner::publishFallbackTrajectory() {
     msg.transforms[0].rotation.z = desired_pose.getRotation().z();
     msg.transforms[0].rotation.w = desired_pose.getRotation().w();
 
-    // Optionally, you can set velocity/acceleration to zero
+    // Zero velocities/accelerations
     geometry_msgs::Twist zero_twist;
     zero_twist.linear.x = zero_twist.linear.y = zero_twist.linear.z = 0;
     zero_twist.angular.x = zero_twist.angular.y = zero_twist.angular.z = 0;
     msg.velocities.resize(1, zero_twist);
     msg.accelerations.resize(1, zero_twist);
 
-    // Publish the fallback desired state
     fallback_pub_.publish(msg);
     ROS_INFO("Published fallback desired state at static pose.");
 }
-
 
 // Main run method to handle both modes
 void BasicPlanner::run() {
