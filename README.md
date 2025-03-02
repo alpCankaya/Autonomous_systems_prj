@@ -23,6 +23,16 @@ sudo apt install curl
 ```bash 
 curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.key | sudo apt-key add -
 ```
+```bash 
+sudo apt update
+```
+```bash 
+sudo apt install ros-noetic-desktop-full
+```
+```bash 
+sudo apt install python-rosdep python-rosinstall python-rosinstall-generator python-wstool build-essential
+```
+
 
 Clone the repostitory: 
 ``` ```
