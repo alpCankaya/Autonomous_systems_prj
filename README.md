@@ -1,6 +1,6 @@
 # Autonomous_systems_prj
-Repository for Autonomous Systems Final Project
-
+1. Introduction
+This repository contains ROS packages for autonomous drone exploration in an unknown cave environment using Unity. The drone utilizes depth camera data to generate a point cloud, which is converted into a 3D Voxel Grid using the OctoMap library.
 # Installation
 
 ## Requirements
