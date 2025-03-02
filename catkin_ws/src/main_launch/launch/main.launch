@@ -2,10 +2,7 @@
 
   <!-- Start sim -->
   <include file="$(find simulation)/launch/simulation.launch" />
-
-  <!-- Delay a bit, wait for sim to run -->
-  <!--node pkg="roslaunch" type="roslaunch" name="delay_node" output="screen" launch-prefix="bash -c 'sleep 10'" /-->
-
+  
   <!-- Start Pointcloud publishing -->
   <include file="$(find depth_to_pointcloud)/launch/depth_to_pcl.launch" />
 

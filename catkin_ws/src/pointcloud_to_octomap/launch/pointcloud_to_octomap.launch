@@ -5,7 +5,7 @@
 
       <!-- OctoMap parameters -->
       <param name="frame_id" value="world"/>
-      <param name="resolution" value="1"/>
+      <param name="resolution" value="2"/>
       <param name="sensor_model/max_range" value="30"/> 
       <param name="latch" value="false"/> 
   </node>

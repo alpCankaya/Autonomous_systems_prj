@@ -111,7 +111,7 @@ class controllerNode{
   }
 
 public:
-  controllerNode():e3(0,0,1),F2W(4,4),hz(1000.0){
+  controllerNode():e3(0,0,1),F2W(4,4),hz(400.0){
 
       // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       //  PART 2 |  Initialize ROS callback handlers
@@ -155,10 +155,10 @@ public:
       // Controller gains
       //
 
-      kx = 12.7;
-      kv = 5.8;
-      kr = 8.8;
-      komega = 1.15;
+      kx = 6.5;
+      kv = 3.7;
+      kr = 3.2;
+      komega = 1.00;
 //      kx = 10;
 //      kv = 5;
 //      kr = 11;
