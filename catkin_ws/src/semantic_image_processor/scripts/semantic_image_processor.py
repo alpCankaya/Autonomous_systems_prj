@@ -8,6 +8,7 @@ from cv_bridge import CvBridge
 from geometry_msgs.msg import PoseStamped
 from tf.transformations import quaternion_matrix
 import os
+from std_msgs.msg import Int32
 
 class ObjectDetection:
     def __init__(self):
@@ -27,9 +28,13 @@ class ObjectDetection:
         self.logged_objects = set()
 
         # File to save stable object positions
-        self.output_file = "object_positions.txt"
+        self.output_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), "object_positions.txt")
+
         # Optionally, clear the file at startup
         open(self.output_file, "w").close()
+
+        # Publisher for detected object count
+        self.object_count_pub = rospy.Publisher("/detected_objects_count", Int32, queue_size=10)
 
         # Subscribe to topics
         rospy.Subscriber("/unity_ros/Quadrotor/Sensors/SemanticCamera/image_raw", Image, self.semantic_callback)
@@ -52,11 +57,7 @@ class ObjectDetection:
         non_black_pixels = np.column_stack(np.where(non_black_mask))
 
         if non_black_pixels.size > 0:
-            selected_pixels = non_black_pixels[np.random.choice(non_black_pixels.shape[0], min(1000, non_black_pixels.shape[0]), replace=False)]
-            # Compute average pixel coordinates (optional use)
-            avg_v = np.mean(selected_pixels[:, 0])
-            avg_u = np.mean(selected_pixels[:, 1])
-
+            selected_pixels = non_black_pixels[np.random.choice(non_black_pixels.shape[0], min(500, non_black_pixels.shape[0]), replace=False)]
             if self.depth_image is not None:
                 self.get_average_depth(selected_pixels)
 
@@ -81,7 +82,7 @@ class ObjectDetection:
             X = avg_depth  
             Y = -(np.mean(selected_pixels[:, 1]) - 160) * avg_depth / 120 
             Z = -(np.mean(selected_pixels[:, 0]) - 120) * avg_depth / 120
-                                                                         
+                                                                             
             object_body_frame = np.array([X, Y, Z])
             if self.body_position is not None and self.body_orientation is not None:
                 object_world_frame = self.transform_to_world(object_body_frame)
@@ -95,8 +96,17 @@ class ObjectDetection:
 
     def track_object(self, object_world_frame):
         """Tracks object positions and filters stable detections using unique object IDs."""
-        threshold = 30 # Distance threshold for associating detections with existing objects
-        
+        target_coordinates = np.array([-59, 0.85, 6.6])  # Target coordinates
+        distance_to_target = np.linalg.norm(object_world_frame - target_coordinates)
+        # Publish the number of detected objects
+        self.object_count_pub.publish(len(self.tracked_objects))
+        # Neglect objects within 50 meters of the target coordinates
+        if distance_to_target < 50:
+            rospy.loginfo(f"Object too close to target coordinates, skipping: {object_world_frame}")
+            return
+
+        threshold = 30  # Distance threshold for associating detections with existing objects
+        threshold2 = 2
         associated_object_id = None
         
         # Try to associate the new detection with an existing object.
@@ -116,22 +126,20 @@ class ObjectDetection:
         # Append the new detection.
         self.tracked_objects[associated_object_id].append(object_world_frame)
 
-        # Keep last 5 detections for this object.
-        if len(self.tracked_objects[associated_object_id]) > 10:
+        # Keep last 10 detections for this object.
+        if len(self.tracked_objects[associated_object_id]) > 20:
             self.tracked_objects[associated_object_id].pop(0)
 
-        # Check stability: if 5 detections exist and they are within threshold, log and save the stable object.
+        # Check stability: if 10 detections exist and they are within threshold, log and save the stable object.
         positions = np.array(self.tracked_objects[associated_object_id])
         if positions.shape[0] == 10:
             diffs = np.max(positions, axis=0) - np.min(positions, axis=0)
-            if np.all(diffs <= threshold):
+            if np.all(diffs <= threshold2):
                 avg_position = np.mean(positions, axis=0)
                 rospy.loginfo(f"Stable object {associated_object_id} detected at: {avg_position}")
 
-                # Only log if this object hasn't been logged before.
                 if associated_object_id not in self.logged_objects:
                     self.logged_objects.add(associated_object_id)
-                    # Save the stable object position with a timestamp to the file.
                     timestamp = rospy.get_time()
                     log_str = f"{timestamp}, Object {associated_object_id}, Position: {avg_position.tolist()}\n"
                     with open(self.output_file, "a") as file:
