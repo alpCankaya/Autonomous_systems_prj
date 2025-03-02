@@ -5,7 +5,7 @@ DStarLite::DStarLite() {}
 nav_msgs::Path DStarLite::plan(const geometry_msgs::Point& goal) {
     nav_msgs::Path path;
     path.header.stamp = ros::Time::now();
-    path.header.frame_id = "map";
+    path.header.frame_id = "world";
 
     geometry_msgs::PoseStamped pose;
     pose.pose.position.x = goal.x;
