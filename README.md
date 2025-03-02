@@ -41,7 +41,14 @@ Open a terminal and navigate to
 
 
 ## Requirements
-
+The **depth_image_proc** package has been utilized for generating the Point Cloud. 
+```bash
+sudo apt install ros-noetic-depth-image-proc 
+```
+For the generation of the OctoMap, octomap and octomap_mapping packages have been utilized.
+```bash
+sudo apt-get install ros-noetic-octomap ros-noetic-octomap-mapping
+```
     - depth_image_proc 
     - octomap
     - opencv2
