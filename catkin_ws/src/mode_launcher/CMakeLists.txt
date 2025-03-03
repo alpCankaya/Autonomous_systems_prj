@@ -8,15 +8,10 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   geometry_msgs
   nav_msgs
-  pcl_conversions
-  pcl_ros
 )
 
-find_package(octomap REQUIRED)
-
 catkin_package(
-  CATKIN_DEPENDS roscpp rospy std_msgs geometry_msgs nav_msgs pcl_conversions pcl_ros
-  DEPENDS octomap
+  CATKIN_DEPENDS roscpp rospy std_msgs geometry_msgs nav_msgs
 )
 
 include_directories(
@@ -24,11 +19,10 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-## Declare a C++ executable for the mode launcher node.
-## Note: Use the full relative path to the source file.
-add_executable(${PROJECT_NAME}_node src/drone_frontier_exploration/src/drone_frontier_exploration.cpp)
+## Derlenecek nod: mode_launcher.cpp (bu dosya, "mode_launcher" paketinizin src dizininde yer almalıdır)
+add_executable(${PROJECT_NAME}_node src/mode_launcher.cpp)
 
-## Link the executable with necessary libraries.
+## Link libraries to the executable
 target_link_libraries(${PROJECT_NAME}_node
   ${catkin_LIBRARIES}
 )

@@ -24,8 +24,7 @@
 
 
 
-  <!-- Start drone frontier exploration 
-  <include file="$(find drone_frontier_exploration)/launch/drone_frontier_exploration.launch" />   -->
+  
   
   <!-- Start RViz with our configuration -->
   <node pkg="rviz" type="rviz" name="rviz" output="screen" args="-d $(find main_launch)/rviz/uav.rviz" /> 
