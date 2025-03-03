@@ -19,7 +19,7 @@
 
 
 
-  <include file="$(find mode_launcher)/launch/mode_launcher.launch" />
+  <include file="$(find drone_state_machine)/launch/drone_state_machine.launch" />
 
 
 

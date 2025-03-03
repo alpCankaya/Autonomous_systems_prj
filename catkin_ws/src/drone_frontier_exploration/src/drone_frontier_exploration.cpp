@@ -296,17 +296,12 @@ bool DroneFrontierExploration::isFrontierPoint(const octomap::point3d &coordinat
         
     // If the node doesn't exist (is unknown space), count it as unknown
     if (!node) {
-      unknown_count++;
+      return true;
     }
   }
   
-  // Eğer bilinmeyen komşu sayısı eşik değerden (örneğin 3) büyükse, bu bir junction noktası olarak kabul edilebilir
-  if (unknown_count >= 3) {
-    ROS_INFO("FIND IT");
-  }
-  
   // Orijinal mantık: en az bir bilinmeyen komşu varsa frontier olarak kabul et
-  return (unknown_count > 0);
+  return false;
 }
 
 void DroneFrontierExploration::publishExplorationGoal(const pcl::PointXYZ &goal_point) {
