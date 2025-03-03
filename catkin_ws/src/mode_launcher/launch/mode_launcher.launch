@@ -1,4 +1,0 @@
-<launch>
-  
-  <node pkg="mode_launcher" type="mode_launcher_node" name="mode_launcher_node" output="screen" />
-</launch>

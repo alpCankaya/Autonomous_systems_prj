@@ -14,18 +14,9 @@
   
   <!-- Run semantic_image_processor -->
   <node pkg="semantic_image_processor" type="semantic_image_processor.py" name="semantic_image_processor" output="screen" />
-
-
-
-
-
+  
   <include file="$(find drone_state_machine)/launch/drone_state_machine.launch" />
 
-
-
-
-  
-  
   <!-- Start RViz with our configuration -->
   <node pkg="rviz" type="rviz" name="rviz" output="screen" args="-d $(find main_launch)/rviz/uav.rviz" /> 
 
