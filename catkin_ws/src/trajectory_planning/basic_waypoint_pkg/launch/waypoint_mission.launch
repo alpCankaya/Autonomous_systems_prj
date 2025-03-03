@@ -1,18 +1,19 @@
 <launch>
     <arg name="mav_name" default="firefly"/>
+    <arg name="node_start_delay" default="15.0" />  
 
     <!--- Predefined Path Planner -->
-    <node name="planner" pkg="basic_waypoint_pkg" type="basic_waypoint_pkg" output="screen" clear_params="true">
+    <node name="planner" pkg="basic_waypoint_pkg" type="basic_waypoint_pkg" output="screen" clear_params="true" launch-prefix="bash -c 'sleep $(arg node_start_delay); $0 $@' ">
         <rosparam command="load" file="$(find basic_waypoint_pkg)/config/trajectory_config.yaml"/>
     </node>
 
     <!--- Trajectory Sampler -->
-    <node name="sampler" pkg="mav_trajectory_generation_ros" type="trajectory_sampler_node" output="screen">
+    <node name="sampler" pkg="mav_trajectory_generation_ros" type="trajectory_sampler_node" output="screen" launch-prefix="bash -c 'sleep $(arg node_start_delay); $0 $@' ">
         <remap from="path_segments_4D" to="trajectory"/>
         <remap from="/command/trajectory" to="desired_trajectory"/>
     </node>
 
     <!--- Trajectory Converter -->
-    <node pkg="basic_waypoint_pkg" type="trajectory_converter" name="trajectory_converter" output="screen"/>
+    <node pkg="basic_waypoint_pkg" type="trajectory_converter" name="trajectory_converter" output="screen" launch-prefix="bash -c 'sleep $(arg node_start_delay); $0 $@' "/>
 
 </launch>
