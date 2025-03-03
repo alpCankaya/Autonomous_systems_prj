@@ -22,7 +22,7 @@ class ObjectDetection:
         # Dictionary to track detected objects.
         # Keys are unique object IDs and values are lists of recent detections.
         self.tracked_objects = {}
-        self.next_object_id = 0  # Unique ID counter for objects
+        self.next_object_id = 1  # Unique ID counter for objects
 
         # Set to keep track of objects already logged as stable.
         self.logged_objects = set()
@@ -98,15 +98,14 @@ class ObjectDetection:
         """Tracks object positions and filters stable detections using unique object IDs."""
         target_coordinates = np.array([-59, 0.85, 6.6])  # Target coordinates
         distance_to_target = np.linalg.norm(object_world_frame - target_coordinates)
-        # Publish the number of detected objects
-        self.object_count_pub.publish(len(self.tracked_objects))
+
         # Neglect objects within 50 meters of the target coordinates
         if distance_to_target < 50:
             rospy.loginfo(f"Object too close to target coordinates, skipping: {object_world_frame}")
             return
 
-        threshold = 30  # Distance threshold for associating detections with existing objects
-        threshold2 = 2
+        threshold = 10  # Distance threshold for associating detections with existing objects
+        
         associated_object_id = None
         
         # Try to associate the new detection with an existing object.
@@ -127,14 +126,14 @@ class ObjectDetection:
         self.tracked_objects[associated_object_id].append(object_world_frame)
 
         # Keep last 10 detections for this object.
-        if len(self.tracked_objects[associated_object_id]) > 20:
+        if len(self.tracked_objects[associated_object_id]) > 10:
             self.tracked_objects[associated_object_id].pop(0)
 
         # Check stability: if 10 detections exist and they are within threshold, log and save the stable object.
         positions = np.array(self.tracked_objects[associated_object_id])
         if positions.shape[0] == 10:
             diffs = np.max(positions, axis=0) - np.min(positions, axis=0)
-            if np.all(diffs <= threshold2):
+            if np.all(diffs <= threshold):
                 avg_position = np.mean(positions, axis=0)
                 rospy.loginfo(f"Stable object {associated_object_id} detected at: {avg_position}")
 
@@ -144,6 +143,9 @@ class ObjectDetection:
                     log_str = f"{timestamp}, Object {associated_object_id}, Position: {avg_position.tolist()}\n"
                     with open(self.output_file, "a") as file:
                         file.write(log_str)
+        stable_objects = [obj_id for obj_id in self.tracked_objects if obj_id in self.logged_objects]
+        # Publish the number of detected objects
+        self.object_count_pub.publish(len(stable_objects))
 
     def run(self):
         rospy.spin()
