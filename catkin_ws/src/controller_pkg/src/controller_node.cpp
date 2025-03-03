@@ -62,7 +62,7 @@ class controllerNode{
   //
   // ~~~~ begin solution
 
-  ros::Subscriber desired_state, current_state;
+  ros::Subscriber desired_state, current_state, desired_state_hold;
   ros::Publisher prop_speeds;
   ros::Timer timer;
 
@@ -111,7 +111,7 @@ class controllerNode{
   }
 
 public:
-  controllerNode():e3(0,0,1),F2W(4,4),hz(1000.0){
+  controllerNode():e3(0,0,1),F2W(4,4),hz(400.0){
 
       // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       //  PART 2 |  Initialize ROS callback handlers
@@ -131,6 +131,9 @@ public:
       // ~~~~ begin solution
       
       desired_state = nh.subscribe("desired_state", 1, &controllerNode::onDesiredState, this);
+      desired_state_hold = nh.subscribe("desired_state_hold", 1, &controllerNode::onDesiredState, this);
+      
+
       current_state = nh.subscribe("current_state_est", 1, &controllerNode::onCurrentState, this);
       prop_speeds = nh.advertise<mav_msgs::Actuators>("rotor_speed_cmds", 1);
       timer = nh.createTimer(ros::Rate(hz), &controllerNode::controlLoop, this);
@@ -152,10 +155,10 @@ public:
       // Controller gains
       //
 
-      kx = 12.7;
-      kv = 5.8;
-      kr = 8.8;
-      komega = 1.15;
+      kx = 6.5;
+      kv = 3.7;
+      kr = 3.2;
+      komega = 1.00;
 //      kx = 10;
 //      kv = 5;
 //      kr = 11;
@@ -216,7 +219,10 @@ public:
       
       tf::Quaternion q;
       tf::quaternionMsgToTF(des_state.transforms[0].rotation , q);
-      yawd = tf::getYaw(q);
+      if (vd.norm() > 1e-3) {  // Avoid division by zero if velocity is too small
+        yawd = atan2(vd.y(), vd.x());
+       }
+      // yawd = atan2(vy, v.z);
       // ROS_INFO_NAMED("onDesiredState", "YAW: %f", yawd);
 
       // ~~~~ end solution

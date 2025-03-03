@@ -2,18 +2,18 @@
 
   <!-- Start sim -->
   <include file="$(find simulation)/launch/simulation.launch" />
-
-  <!-- Delay a bit, wait for sim to run -->
-  <node pkg="roslaunch" type="roslaunch" name="delay_node" output="screen" launch-prefix="bash -c 'sleep 10'" />
-
+  
   <!-- Start Pointcloud publishing -->
   <include file="$(find depth_to_pointcloud)/launch/depth_to_pcl.launch" />
 
   <!-- Start Octomap processing -->
   <include file="$(find pointcloud_to_octomap)/launch/pointcloud_to_octomap.launch" />
 
-  <!-- Start trajectory planner (Disabled for now) -->
-  <!--include file="$(find basic_waypoint_pkg)/launch/waypoint_mission.launch" /-->
+  <!-- Start trajectory planner -->
+  <include file="$(find basic_waypoint_pkg)/launch/waypoint_mission.launch" />
+
+  <!-- Start drone frontier exploration  -->
+  <include file="$(find drone_frontier_exploration)/launch/drone_frontier_exploration.launch" />
   
   <!-- Start RViz with our configuration -->
   <node pkg="rviz" type="rviz" name="rviz" output="screen" args="-d $(find main_launch)/rviz/uav.rviz" />
