@@ -47,7 +47,7 @@ sudo apt install python-rosdep python-rosinstall python-rosinstall-generator pyt
 ## Dependencies 
 The **depth_image_proc** package has been utilized for generating the Point Cloud. 
 ```bash
-sudo apt install ros-noetic-depth-image-proc 
+sudo apt install ros-<distro>-depth-image-proc 
 ```
 For the generation of the OctoMap, octomap and octomap_mapping packages have been utilized.
 ```bash
