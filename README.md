@@ -81,6 +81,10 @@ catkin build
 ```bash
 source devel/setup.bash
 ```
+For the case if semantic_image_processor.py script is not executable, navigate to the catkin workspace and run: 
+```bash
+chmod +x src/semantic_image_processor/scripts/semantic_image_processor.py 
+```
 ## Launching the Simulation 
 To run the simulation in the terminal: 
 ```bash
