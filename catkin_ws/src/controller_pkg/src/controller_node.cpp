@@ -155,10 +155,10 @@ public:
       // Controller gains
       //
 
-      kx = 6.5;
-      kv = 3.7;
-      kr = 3.2;
-      komega = 1.00;
+      kx = 12.7;
+      kv = 5.8;
+      kr = 8.8;
+      komega = 1.15;
 //      kx = 10;
 //      kv = 5;
 //      kr = 11;
