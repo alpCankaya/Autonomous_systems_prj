@@ -53,10 +53,10 @@ For the generation of the OctoMap, octomap and octomap_mapping packages have bee
 ```bash
 sudo apt install ros-<distro>-image ros-<distro>-octomap
 ```
-    - depth_image_proc 
-    - octomap
-    - opencv2
-
+```bash
+sudo apt install ros-<distro>-vision-opencv
+sudo apt install ros-<distro>-cv-bridge
+```
 ## How to run
 Clone the repostitory: 
 ```bash
