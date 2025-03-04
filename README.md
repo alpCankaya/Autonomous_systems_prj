@@ -34,13 +34,6 @@ sudo apt install ros-noetic-desktop-full
 ```bash 
 sudo apt install python-rosdep python-rosinstall python-rosinstall-generator python-wstool build-essential
 ```
-
-Clone the repostitory: 
-```bash
-git clone git@github.com:alpCankaya/Autonomous_systems_prj.git 
-```
-Open a terminal and navigate to 
-
 # Simulation Setup
 
 1. **Copy Files:**  
@@ -58,16 +51,13 @@ sudo apt install ros-noetic-depth-image-proc
 ```
 For the generation of the OctoMap, octomap and octomap_mapping packages have been utilized.
 ```bash
-sudo apt-get install ros-noetic-octomap ros-noetic-octomap-mapping
+sudo apt install ros-<distro>-image ros-<distro>-octomap
 ```
     - depth_image_proc 
     - octomap
     - opencv2
 
-`sudo apt install ros-<distro>-image ros-<distro>-octomap`
-
 ## How to run
-
 Clone the repostitory: 
 ```bash
 git clone git@github.com:alpCankaya/Autonomous_systems_prj.git 
@@ -86,9 +76,8 @@ catkin build
 ```bash
 source devel/setup.bash
 ```
-
 ## Launching the Simulation 
-To run the simulation in terminal: 
+To run the simulation in the terminal: 
 ```bash
 roslaunch main_launch main.launch
 ```
