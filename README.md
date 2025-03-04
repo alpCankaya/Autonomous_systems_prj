@@ -41,6 +41,15 @@ git clone git@github.com:alpCankaya/Autonomous_systems_prj.git
 ```
 Open a terminal and navigate to 
 
+# Simulation Setup
+
+1. **Copy Files:**  
+   Copy the unpacked simulation files (see the **Sync&Share** folder for the files) into the folder `devel/lib/simulation`.
+
+2. **Make It Executable:**  
+   Don't forget to make the executable Simulation.x86_64 executable. (chmod +x catkin_ws/devel/lib/simulation/Simulation.x86_64)
+
+
 
 ## Dependencies 
 The **depth_image_proc** package has been utilized for generating the Point Cloud. 
