@@ -57,7 +57,7 @@ class ObjectDetection:
         non_black_pixels = np.column_stack(np.where(non_black_mask))
 
         if non_black_pixels.size > 0:
-            selected_pixels = non_black_pixels[np.random.choice(non_black_pixels.shape[0], min(500, non_black_pixels.shape[0]), replace=False)]
+            selected_pixels = non_black_pixels[np.random.choice(non_black_pixels.shape[0], min(1000, non_black_pixels.shape[0]), replace=False)]
             if self.depth_image is not None:
                 self.get_average_depth(selected_pixels)
 
@@ -106,7 +106,7 @@ class ObjectDetection:
             return
 
         threshold = 30  # Distance threshold for associating detections with existing objects
-        threshold2 = 2
+        threshold2 = 5
         associated_object_id = None
         
         # Try to associate the new detection with an existing object.
@@ -132,7 +132,7 @@ class ObjectDetection:
 
         # Check stability: if 10 detections exist and they are within threshold, log and save the stable object.
         positions = np.array(self.tracked_objects[associated_object_id])
-        if positions.shape[0] == 10:
+        if positions.shape[0] == 5:
             diffs = np.max(positions, axis=0) - np.min(positions, axis=0)
             if np.all(diffs <= threshold2):
                 avg_position = np.mean(positions, axis=0)
