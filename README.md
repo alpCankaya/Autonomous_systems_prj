@@ -53,6 +53,7 @@ For the generation of the OctoMap, octomap and octomap_mapping packages have bee
 ```bash
 sudo apt install ros-<distro>-image ros-<distro>-octomap
 ```
+For the object detection from the semantic image view OpenCV and cv_bridge are needed.
 ```bash
 sudo apt install ros-<distro>-vision-opencv
 sudo apt install ros-<distro>-cv-bridge
