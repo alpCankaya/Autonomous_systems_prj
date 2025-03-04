@@ -1,0 +1,4 @@
+<launch>
+  
+  <node pkg="drone_state_machine" type="drone_state_machine_node" name="drone_state_machine_node" output="screen" />
+</launch>
