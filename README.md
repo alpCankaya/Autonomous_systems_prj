@@ -58,6 +58,10 @@ For the object detection from the semantic image view OpenCV and cv_bridge are n
 sudo apt install ros-<distro>-vision-opencv
 sudo apt install ros-<distro>-cv-bridge
 ```
+For handling quaternion transformations used in coordinate conversions.
+```bash
+pip install numpy tf-transformations
+```
 ## How to run
 Clone the repostitory: 
 ```bash
